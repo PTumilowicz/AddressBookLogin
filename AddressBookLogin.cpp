@@ -1,10 +1,10 @@
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <fstream>
-#include <vector>
 #include <cctype>
 #include <cstdio>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
 
 using namespace std;
 
@@ -196,6 +196,11 @@ bool checkUserLogin(vector <User>& users, const string &login)
     return false;
 }
 
+void pasteUserToFile(ofstream& file, const User& user)
+{
+    file << user.id << '|' << user.login << '|' << user.password << '|' << endl;
+}
+
 void addUserToFile(const User &user)
 {
     ofstream file("users.txt", ios::app);
@@ -205,7 +210,7 @@ void addUserToFile(const User &user)
         return;
     }
 
-    file << user.id << '|' << user.login << '|' << user.password << '|' << endl;
+    pasteUserToFile(file, user);
 
     file.close();
 }
@@ -234,11 +239,6 @@ void registerUser(vector <User>& users)
 
     cout << "\nUser registered!\n" << endl;
     system("pause");
-}
-
-void pasteUserToFile(ofstream& file, const User& user)
-{
-    file << user.id << '|' << user.login << '|' << user.password << '|' << endl;
 }
 
 void modifyUserFileAfterEdit(const User& user)
