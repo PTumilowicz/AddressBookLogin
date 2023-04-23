@@ -621,11 +621,11 @@ int modifyContactFileAfterDelete(int id)
         istringstream iss(line);
 
         getline(iss, field, '|');
-        lastContactId = stoi(field);
 
-        if (lastContactId != id)
+        if (stoi(field) != id)
         {
             tempFile << line << endl;
+            lastContactId = stoi(field);
         }
     }
 
@@ -633,6 +633,11 @@ int modifyContactFileAfterDelete(int id)
     tempFile.close();
 
     remove("contacts.txt");
+
+    if (rename("temp_contacts.txt", "contacts.txt") != 0)
+    {
+        perror("Error renaming file");
+    }
 
     cout << "Contact deleted succesfully." << endl;
     system("pause");
