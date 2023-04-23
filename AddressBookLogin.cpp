@@ -67,10 +67,10 @@ int readInt()
 }
 
 // Menus
-void titleMessage()
+void titleMessage(const string &menuName)
 {
     system("cls");
-    cout << "~~~~~~ ADDRESS BOOK ~~~~~~" << endl;
+    cout << "~~~~~~ ADDRESS BOOK ~~ " << menuName << " ~~~~~~" << endl << endl;
 }
 
 void loginMenu()
@@ -132,7 +132,7 @@ int loginUser(vector <User> &users)
 {
     string login, password;
 
-    titleMessage();
+    titleMessage("USER LOGIN");
     cout << "Enter login: ";
     login = readLine();
 
@@ -184,7 +184,7 @@ bool checkUserLogin(vector <User>& users, const string &login)
     return false;
 }
 
-void addUserToFile(User user)
+void addUserToFile(const User &user)
 {
     ofstream file("users.txt", ios::app);
 
@@ -204,7 +204,7 @@ void registerUser(vector <User>& users)
     User user;
     user.id = users.empty() ? 1 : users.back().id + 1;
 
-    titleMessage();
+    titleMessage("USER REGISTER");
     
     while (loginExists)
     {
@@ -225,7 +225,7 @@ void registerUser(vector <User>& users)
 }
 
 // Contact functions
-int loadContactsFromFile(vector <Contact> &contacts, int loggedUserId)
+int loadContactsFromFile(vector <Contact> &contacts, const int loggedUserId)
 {
     int lastContactId = 0;
     string line, field;
@@ -283,14 +283,14 @@ void addContactToFile(const Contact &contact)
     file.close();
 }
 
-int addContact(vector <Contact>& contacts, int lastContactId, int loggedUserId)
+int addContact(vector <Contact>& contacts, int lastContactId, const int loggedUserId)
 {
     Contact contact;
 
     contact.id = ++lastContactId;
     contact.userId = loggedUserId;
 
-    titleMessage();
+    titleMessage("ADD CONTACT");
 
     cout << "Enter first name: ";
     contact.firstName = readLine();
@@ -316,8 +316,9 @@ int addContact(vector <Contact>& contacts, int lastContactId, int loggedUserId)
     return lastContactId;
 }
 
-void readContact(const Contact contact)
+void readContact(const Contact &contact)
 {
+    cout << "Id: " << contact.id << endl;
     cout << "Contact name: " << contact.firstName << " " << contact.lastName << endl;
     cout << "Phone number: " << contact.phone << endl;
     cout << "Address: " << contact.address << endl;
@@ -326,9 +327,121 @@ void readContact(const Contact contact)
 
 void readAllContacts(vector <Contact>& contacts)
 {
+    titleMessage("ALL CONTACTS");
+
+    if (contacts.empty())
+    {
+        cout << "Contact Book empty." << endl;
+    }
+
     for (Contact& contact : contacts)
     {
         readContact(contact);
+    }
+
+    system("pause");
+}
+
+void searchByFirstName(vector <Contact>& contacts)
+{
+    bool contactFound = false;
+    string firstName;
+    titleMessage("SEARCH BY FIRST NAME");
+
+    if (contacts.empty())
+    {
+        cout << "Contact Book empty." << endl;
+        system("pause");
+        return;
+    }
+
+    cout << "Enter name, you want to find: ";
+    firstName = readLine();
+
+    for (Contact& contact : contacts)
+    {
+        if (contact.firstName == firstName)
+        {
+            readContact(contact);
+            contactFound = true;
+        }
+    }
+
+    if (!contactFound)
+    {
+        cout << endl << "No contacts found..." << endl;
+    }
+
+    system("pause");
+}
+
+void searchByLastName(vector <Contact>& contacts)
+{
+    bool contactFound = false;
+    string lastName;
+    titleMessage("SEARCH BY FIRST NAME");
+
+    if (contacts.empty())
+    {
+        cout << "Contact Book empty." << endl;
+        system("pause");
+        return;
+    }
+
+    cout << "Enter name, you want to find: ";
+    lastName = readLine();
+
+    for (Contact& contact : contacts)
+    {
+        if (contact.firstName == lastName)
+        {
+            readContact(contact);
+            contactFound = true;
+        }
+    }
+
+    if (!contactFound)
+    {
+        cout << endl << "No contacts found..." << endl;
+    }
+
+    system("pause");
+}
+
+string showAvailableIds(vector <Contact>& contacts)
+{
+    string availableIds = "";
+
+    for (Contact& contact : contacts)
+    {
+        availableIds.append(to_string(contact.id) + ", ");
+    }
+
+    availableIds = availableIds.substr(0, availableIds.length() - 2);
+
+    return availableIds;
+}
+
+void editContact(vector <Contact>& contacts)
+{
+    int id = 0;
+    string availableIds = showAvailableIds(contacts);
+
+    titleMessage("EDIT CONTACT");
+
+    if (contacts.empty())
+    {
+        cout << "Contact Book empty." << endl;
+        system("pause");
+        return;
+    }
+
+    cout << "Choose id of contact to edit. Available ids: " << availableIds;
+    id = readInt();
+
+    for (Contact& contact : contacts)
+    {
+
     }
 
     system("pause");
@@ -346,7 +459,7 @@ int main()
 
     while(menuFlag)
     {
-        titleMessage();
+        titleMessage("START MENU");
         loginMenu();
         choice = readSign();
 
@@ -354,6 +467,7 @@ int main()
         {
         case '1':
             loggedUserId = loginUser(users);
+            lastContactId = loadContactsFromFile(contacts, loggedUserId);
             break;
         case '2':
             registerUser(users);
@@ -369,9 +483,7 @@ int main()
 
         while (loggedUserId)
         {
-            lastContactId = loadContactsFromFile(contacts, loggedUserId);
-
-            titleMessage();
+            titleMessage("MAIN MENU");
             mainMenu();
             choice = readSign();
 
@@ -381,13 +493,22 @@ int main()
                 lastContactId = addContact(contacts, lastContactId, loggedUserId);
                 break;
             case '2':
-                // Search by firstName
+                searchByFirstName(contacts);
                 break;
             case '3':
-                // Search by lastName
+                searchByLastName(contacts);
                 break;
             case '4':
                 readAllContacts(contacts);
+                break;
+            case '5':
+                editContact(contacts);
+                break;
+            case '6':
+                // Delete
+                break;
+            case '9':
+                //change password
                 break;
             case '0':
                 contacts.clear();
