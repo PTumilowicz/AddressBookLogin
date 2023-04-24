@@ -68,6 +68,19 @@ int readInt()
     return number;
 }
 
+void handleFileSwap(string oldFileName, string tempFileName)
+{
+    if (std::remove(oldFileName.c_str()) != 0)
+    {
+        perror("Error removing file");
+    }
+
+    if (rename(tempFileName.c_str(), oldFileName.c_str()) != 0)
+    {
+        perror("Error renaming file");
+    }
+}
+
 // Menus
 void titleMessage(const string &menuName)
 {
@@ -243,9 +256,9 @@ void registerUser(vector <User>& users)
 
 void modifyUserFileAfterEdit(const User& user)
 {
-    string line, field;
-    ifstream file("users.txt", ios::in);
-    ofstream tempFile("temp_users.txt", ios::out);
+    string line, field, oldFileName = "users.txt", tempFileName = "temp_users.txt";
+    ifstream file(oldFileName, ios::in);
+    ofstream tempFile(tempFileName, ios::out);
 
     while (getline(file, line))
     {
@@ -266,12 +279,7 @@ void modifyUserFileAfterEdit(const User& user)
     file.close();
     tempFile.close();
 
-    remove("users.txt");
-
-    if (rename("temp_users.txt", "users.txt") != 0)
-    {
-        perror("Error renaming file");
-    }
+    handleFileSwap(oldFileName, tempFileName);
 
     cout << "User data edited succesfully." << endl;
     system("pause");
@@ -507,9 +515,9 @@ string showAvailableIds(vector <Contact>& contacts)
 
 void modifyContactFileAfterEdit(const Contact& contact)
 {
-    string line, field;
-    ifstream file("contacts.txt", ios::in);
-    ofstream tempFile("temp_contacts.txt", ios::out);
+    string line, field, oldFileName = "contacts.txt", tempFileName = "temp_contacts.txt";
+    ifstream file(oldFileName, ios::in);
+    ofstream tempFile(tempFileName, ios::out);
 
     while (getline(file, line))
     {
@@ -530,12 +538,7 @@ void modifyContactFileAfterEdit(const Contact& contact)
     file.close();
     tempFile.close();
 
-    remove("contacts.txt");
-
-    if (rename("temp_contacts.txt", "contacts.txt") != 0)
-    {
-        perror("Error renaming file");
-    }
+    handleFileSwap(oldFileName, tempFileName);
      
     cout << "Contact data edited succesfully." << endl;
     system("pause");
@@ -612,9 +615,9 @@ void editContact(vector <Contact>& contacts)
 int modifyContactFileAfterDelete(int id)
 {
     int lastContactId = 0;
-    string line, field;
-    ifstream file("contacts.txt", ios::in);
-    ofstream tempFile("temp_contacts.txt", ios::out);
+    string line, field, oldFileName = "contacts.txt", tempFileName = "temp_contacts.txt";
+    ifstream file(oldFileName, ios::in);
+    ofstream tempFile(tempFileName, ios::out);
 
     while (getline(file, line))
     {
@@ -632,12 +635,7 @@ int modifyContactFileAfterDelete(int id)
     file.close();
     tempFile.close();
 
-    remove("contacts.txt");
-
-    if (rename("temp_contacts.txt", "contacts.txt") != 0)
-    {
-        perror("Error renaming file");
-    }
+    handleFileSwap(oldFileName, tempFileName);
 
     cout << "Contact deleted succesfully." << endl;
     system("pause");
